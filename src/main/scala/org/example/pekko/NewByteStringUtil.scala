@@ -18,9 +18,9 @@ final object NewByteStringUtil {
     case cs: ByteString1C =>
       getInputStreamUnsafe(cs)
     case _ => {
-      byteStringInputStreamMethodTypeOpt.map { mh =>
-        mh.invoke(bs).asInstanceOf[InputStream]
-      }.getOrElse {
+      if (byteStringInputStreamMethodTypeOpt.isDefined) {
+        byteStringInputStreamMethodTypeOpt.get.invoke(bs).asInstanceOf[InputStream]
+      } else {
         legacyConvert(bs.compact)
       }
     }
