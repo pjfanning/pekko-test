@@ -17,13 +17,12 @@ final object NewByteStringUtil {
   def getInputStream(bs: ByteString): InputStream = bs match {
     case cs: ByteString1C =>
       getInputStreamUnsafe(cs)
-    case _ => {
+    case _ =>
       if (byteStringInputStreamMethodTypeOpt.isDefined) {
         byteStringInputStreamMethodTypeOpt.get.invoke(bs).asInstanceOf[InputStream]
       } else {
         legacyConvert(bs.compact)
       }
-    }
   }
 
   private def legacyConvert(bs: ByteString): InputStream = bs match {
