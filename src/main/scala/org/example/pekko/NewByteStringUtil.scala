@@ -14,17 +14,26 @@ final object NewByteStringUtil {
     lookup.findVirtual(classOf[ByteString], "asInputStream", inputStreamMethodType)
   }.toOption
 
-  def getInputStream(byteString: ByteString): InputStream = {
-    byteString match {
-      case cs: ByteString1C =>
-        new ByteArrayInputStream(cs.toArrayUnsafe())
-      case _ =>
-        byteStringInputStreamMethodTypeOpt.map { mh =>
-          mh.invoke(byteString).asInstanceOf[InputStream]
-        }.getOrElse {
-          val data = byteString.toArrayUnsafe()
-          new ByteArrayInputStream(data)
-        }
+  def getInputStream(bs: ByteString): InputStream = bs match {
+    case cs: ByteString1C =>
+      getInputStreamUnsafe(cs)
+    case _ => {
+      byteStringInputStreamMethodTypeOpt.map { mh =>
+        mh.invoke(bs).asInstanceOf[InputStream]
+      }.getOrElse {
+        legacyConvert(bs.compact)
+      }
     }
   }
+
+  private def legacyConvert(bs: ByteString): InputStream = bs match {
+    case cs: ByteString1C =>
+      getInputStreamUnsafe(cs)
+    case _ =>
+      // NOTE: We actually measured recently, and compact + use array was pretty good usually
+      legacyConvert(bs.compact)
+  }
+
+  private def getInputStreamUnsafe(bs: ByteString): InputStream =
+    new ByteArrayInputStream(bs.toArrayUnsafe())
 }
