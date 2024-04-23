@@ -1,6 +1,7 @@
 package org.example.pekko
 
 import org.apache.pekko.util.ByteString
+import org.apache.pekko.util.ByteString.ByteString1C
 
 import java.io.{ByteArrayInputStream, InputStream}
 import java.lang.invoke.{MethodHandles, MethodType}
@@ -14,11 +15,16 @@ final object NewByteStringUtil {
   }.toOption
 
   def getInputStream(byteString: ByteString): InputStream = {
-    byteStringInputStreamMethodTypeOpt.map { mh =>
-      mh.invoke(byteString).asInstanceOf[InputStream]
-    }.getOrElse {
-      val data = byteString.toArrayUnsafe()
-      new ByteArrayInputStream(data)
+    byteString match {
+      case cs: ByteString1C =>
+        new ByteArrayInputStream(cs.toArrayUnsafe())
+      case _ =>
+        byteStringInputStreamMethodTypeOpt.map { mh =>
+          mh.invoke(byteString).asInstanceOf[InputStream]
+        }.getOrElse {
+          val data = byteString.toArrayUnsafe()
+          new ByteArrayInputStream(data)
+        }
     }
   }
 }
