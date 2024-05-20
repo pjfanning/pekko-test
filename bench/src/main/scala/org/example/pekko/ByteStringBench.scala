@@ -1,6 +1,7 @@
 package org.example.pekko
 
 import org.apache.commons.io.IOUtils
+import org.apache.pekko.io.NewerByteStringUtil
 import org.apache.pekko.util.ByteString
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
@@ -36,6 +37,12 @@ class ByteStringBench {
   }
 
   @Benchmark
+  def newerGetInputStream(blackhole: Blackhole): Unit = {
+    val is = NewerByteStringUtil.getInputStream(byteString)
+    blackhole.consume(IOUtils.toByteArray(is))
+  }
+
+  @Benchmark
   def oldGetInputStreamSimple(blackhole: Blackhole): Unit = {
     val is = OldByteStringUtil.getInputStream(simpleByteString)
     blackhole.consume(IOUtils.toByteArray(is))
@@ -44,6 +51,12 @@ class ByteStringBench {
   @Benchmark
   def newGetInputStreamSimple(blackhole: Blackhole): Unit = {
     val is = NewByteStringUtil.getInputStream(simpleByteString)
+    blackhole.consume(IOUtils.toByteArray(is))
+  }
+
+  @Benchmark
+  def newerGetInputStreamSimple(blackhole: Blackhole): Unit = {
+    val is = NewerByteStringUtil.getInputStream(simpleByteString)
     blackhole.consume(IOUtils.toByteArray(is))
   }
 }
