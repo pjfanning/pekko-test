@@ -5,8 +5,12 @@ ThisBuild / scalaVersion := "2.13.16"
 //ThisBuild / resolvers += Resolver.ApacheMavenSnapshotsRepo
 
 val pekkoVersion = "1.1.5"
+// Java 8 friendly versions that we link in our releases
 val aeronVersion = "1.45.1"
 val agronaVersion = "1.22.0"
+// latest aeron and agrona versions
+// val aeronVersion = "1.48.5"
+// val agronaVersion = "2.2.4"
 
 lazy val root = (project in file("."))
   .settings(
@@ -27,3 +31,8 @@ lazy val root = (project in file("."))
 lazy val bench = project
   .dependsOn(root)
   .enablePlugins(JmhPlugin)
+
+Test / javaOptions ++= Seq(
+  // for aeron
+  "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"
+)

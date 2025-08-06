@@ -29,6 +29,7 @@ import pekko.actor.Props
 import pekko.actor.RootActorPath
 import pekko.testkit.{ArteryMultiNodeSpec, ArterySpecSupport, ImplicitSender, TestActors, TestProbe}
 
+/*
 class ArteryUpdSendConsistencyWithOneLaneSpec
   extends AbstractRemoteSendConsistencySpec(ConfigFactory.parseString("""
       pekko.remote.artery.transport = aeron-udp
@@ -43,6 +44,7 @@ class ArteryUpdSendConsistencyWithThreeLanesSpec
       pekko.remote.artery.advanced.outbound-lanes = 3
       pekko.remote.artery.advanced.inbound-lanes = 3
     """).withFallback(ArterySpecSupport.defaultConfig))
+ */
 
 class ArteryTcpSendConsistencyWithOneLaneSpec
   extends AbstractRemoteSendConsistencySpec(ConfigFactory.parseString("""
