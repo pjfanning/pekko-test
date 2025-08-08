@@ -13,4 +13,7 @@ object Main extends App {
   println(IOUtils.toString(inputStream, StandardCharsets.UTF_8))
   val inputStream2 = NewerByteStringUtil.getInputStream(byteString)
   println(IOUtils.toString(inputStream2, StandardCharsets.UTF_8))
+
+  val buf = MemorySegmentBuffer.createByteBufferViaMethodHandle(1024)
+  println(buf)
 }
