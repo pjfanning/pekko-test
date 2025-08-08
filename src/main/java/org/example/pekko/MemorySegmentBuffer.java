@@ -9,11 +9,8 @@ import java.nio.ByteBuffer;
 
 public class MemorySegmentBuffer {
   public static ByteBuffer createByteBuffer(int size) {
-    try (Arena arena = Arena.ofShared()) {
-      MemorySegment segment = arena.allocate(size);
-      segment.unload();
-      return segment.asByteBuffer();
-    }
+    MemorySegment segment = Arena.global().allocate(size);
+    return segment.asByteBuffer();
   }
 
   private static MethodHandle arenaLookup;
@@ -26,7 +23,7 @@ public class MemorySegmentBuffer {
       Class<?> arenaClass = Class.forName("java.lang.foreign.Arena");
       Class<?> segmentClass = Class.forName("java.lang.foreign.MemorySegment");
       MethodHandles.Lookup lookup = MethodHandles.lookup();
-      arenaLookup = lookup.findStatic(arenaClass, "ofShared", MethodType.methodType(arenaClass));
+      arenaLookup = lookup.findStatic(arenaClass, "global", MethodType.methodType(arenaClass));
       allocateMethod = lookup.findVirtual(arenaClass, "allocate", MethodType.methodType(segmentClass, long.class));
       asByteBufferMethod = lookup.findVirtual(segmentClass, "asByteBuffer", MethodType.methodType(ByteBuffer.class));
     } catch (Throwable t) {
@@ -35,7 +32,8 @@ public class MemorySegmentBuffer {
   }
 
   public static ByteBuffer createByteBufferViaMethodHandle(long size) {
-    try (AutoCloseable arena = (AutoCloseable) arenaLookup.invoke()) {
+    try {
+      Object arena = arenaLookup.invoke();
       Object segment = allocateMethod.invoke(arena, size);
       return (ByteBuffer) asByteBufferMethod.invoke(segment);
     } catch (Throwable t) {
